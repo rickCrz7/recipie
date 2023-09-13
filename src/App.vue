@@ -7,7 +7,7 @@
             <input
                 v-model="input"
                 type="text"
-                class="border-2 border-gray-300 p-2 w-1/2 text-black rounded-md"
+                class="border-2 border-gray-300 p-2 w-3/4 text-black rounded-md"
                 placeholder="Add a recipie"
                 @keyup.enter="addRecipie"
             />
@@ -19,23 +19,62 @@
             </button>
         </div>
         <div class="container mx-auto p-12 min-h-screen flex flex-col">
-            <ul>
-                <li
-                    v-for="recipie in recipies"
-                    :key="recipie.id"
-                    class="bg-amber-400 text-gray-900 text-4xl tracking-widest py-10 px-4 rounded-md mb-2 flex justify-between items-center shadow shadow-blue hover:shadow-md transition-all"
+            <div v-for="recipie in recipies" :key="recipie.id">
+                <div
+                    class="bg-amber-400 text-gray-900 text-4xl tracking-widest py-10 px-4 rounded-t-md mt-2 flex justify-between items-center transition-all"
                 >
+                    <button
+                        class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-200"
+                        @click="deleteRecipie(recipie.id)"
+                    >
+                        <i class="i-mdi:delete"></i>
+                    </button>
                     {{ recipie.name }}
                     <div class="flex flex-col items-center">
                         <button
-                            class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-100"
-                            @click="deleteRecipie(recipie.id)"
+                            :key="recipie.id"
+                            class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-200"
+                            @click="toggleShow()"
+                        >
+                            <i class="i-mdi:chef-hat"></i>
+                            <i class="i-mdi:arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <div
+                    v-if="show"
+                    class="bg-amber-400 text-gray-900 text-4xl tracking-widest p-2 flex justify-center items-center transition-all"
+                >
+                    <input
+                        v-model="ingredientInput"
+                        type="text"
+                        class="border-2 border-gray-300 p-2 w-3/4 text-black rounded-md"
+                        placeholder="Add an ingredient"
+                        @keyup.enter="addIngredient(recipie)"
+                    />
+                    <button
+                        class="bg-white text-blue-900 font-semibold rounded-md ml-2 flex align-center p-1 hover:bg-blue-200"
+                        @click="addIngredient(recipie)"
+                    >
+                        <i class="i-mdi:add"></i>
+                    </button>
+                </div>
+                <div class="rounded-b-md bg-amber-400">
+                    <div
+                        v-for="ingredient in recipie.ingredients"
+                        :key="ingredient.id"
+                        class="text-gray-900 text-4xl tracking-widest py-4 px-4 flex justify-between items-center transition-all"
+                    >
+                        {{ ingredient.name }}
+                        <button
+                            class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-200"
+                            @click="deleteIngredient(ingredient.id)"
                         >
                             <i class="i-mdi:delete"></i>
                         </button>
                     </div>
-                </li>
-            </ul>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -57,6 +96,7 @@ interface Ingredients {
 
 const recipies = ref([] as Recipie[])
 const input = ref('')
+const ingredientInput = ref('')
 const show = ref(false)
 
 const addRecipie = () => {
@@ -72,9 +112,27 @@ const addIngredient = (recipie: Recipie) => {
     recipie.ingredients.push({
         id: recipie.ingredients.length + 1,
         recipieId: recipie.id,
-        name: input.value
+        name: ingredientInput.value
     })
-    input.value = ''
+    ingredientInput.value = ''
+}
+
+const deleteIngredient = (id: number) => {
+    recipies.value.forEach((recipie) => {
+        recipie.ingredients = recipie.ingredients.filter(
+            (ingredient) => ingredient.id !== id
+        )
+    })
+}
+
+const toggleShow = () => {
+    if (show.value) {
+        show.value = false
+        return
+    } else {
+        show.value = true
+        return
+    }
 }
 
 const deleteRecipie = (id: number) => {
