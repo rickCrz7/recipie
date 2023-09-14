@@ -1,7 +1,7 @@
 <template>
     <div class="p-4 items center">
         <div class="flex justify-center m-4">
-            <h1 class="text-4xl tracking-wider">RECIPIES</h1>
+            <h1 class="text-5xl tracking-widest">RECIPIES</h1>
         </div>
         <div class="container mx-auto p-12 min-h-screen flex flex-col">
             <div class="flex justify-center mb-2">
@@ -13,10 +13,10 @@
                     @keyup.enter="addRecipie"
                 />
                 <button
-                    class="bg-white text-blue-900 font-semibold p-2 rounded-lg ml-2"
+                    class="bg-white text-blue-900 font-semibold p-1 rounded-lg ml-2 text-4xl"
                     @click="addRecipie"
                 >
-                    ADD
+                    <i class="i-mdi:add"></i>
                 </button>
             </div>
             <div v-for="recipie in recipies" :key="recipie.id">
@@ -26,7 +26,6 @@
                     <button
                         v-if="!recipie.show"
                         class="rounded-full flex items-center p-2"
-                        @click="deleteRecipie(recipie.id)"
                     >
                         <i class="i-mdi:delete invisible"></i>
                     </button>
@@ -111,22 +110,20 @@ interface Ingredients {
 const recipies = ref([] as Recipie[])
 const input = ref('')
 const ingredientInput = ref('')
-const show = ref(false)
-const whichElement = ref('')
 
 const addRecipie = () => {
     recipies.value.push({
-        id: recipies.value.length + 1,
+        id: Math.random(),
         name: input.value,
         show: false,
-        ingredients: []
-    })
+        ingredients: [] as Ingredients[]
+    } as Recipie)
     input.value = ''
 }
 
 const addIngredient = (recipie: Recipie) => {
     recipie.ingredients.push({
-        id: recipie.ingredients.length + 1,
+        id: Math.random(),
         recipieId: recipie.id,
         name: ingredientInput.value
     })
