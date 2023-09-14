@@ -3,28 +3,36 @@
         <div class="flex justify-center m-4">
             <h1 class="text-4xl tracking-wider">RECIPIES</h1>
         </div>
-        <div class="flex justify-center">
-            <input
-                v-model="input"
-                type="text"
-                class="border-2 border-gray-300 p-2 w-3/4 text-black rounded-md"
-                placeholder="Add a recipie"
-                @keyup.enter="addRecipie"
-            />
-            <button
-                class="bg-white text-blue-900 font-semibold p-2 rounded-lg ml-2"
-                @click="addRecipie"
-            >
-                ADD
-            </button>
-        </div>
         <div class="container mx-auto p-12 min-h-screen flex flex-col">
+            <div class="flex justify-center mb-2">
+                <input
+                    v-model="input"
+                    type="text"
+                    class="border-2 border-gray-300 p-2 w-full text-black rounded-md"
+                    placeholder="Add a recipie"
+                    @keyup.enter="addRecipie"
+                />
+                <button
+                    class="bg-white text-blue-900 font-semibold p-2 rounded-lg ml-2"
+                    @click="addRecipie"
+                >
+                    ADD
+                </button>
+            </div>
             <div v-for="recipie in recipies" :key="recipie.id">
                 <div
-                    class="bg-amber-400 text-gray-900 text-4xl tracking-widest py-10 px-4 rounded-t-md mt-2 flex justify-between items-center transition-all"
+                    class="bg-#ffe6a7 text-gray-900 text-4xl tracking-widest py-10 px-4 rounded-t-md mt-2 flex justify-between items-center transition-all"
                 >
                     <button
-                        class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-200"
+                        v-if="!recipie.show"
+                        class="rounded-full flex items-center p-2"
+                        @click="deleteRecipie(recipie.id)"
+                    >
+                        <i class="i-mdi:delete invisible"></i>
+                    </button>
+                    <button
+                        v-if="recipie.show"
+                        class="hover:bg-white hover:text-black rounded-full flex items-center p-2 bg-#6f1d1b text-white"
                         @click="deleteRecipie(recipie.id)"
                     >
                         <i class="i-mdi:delete"></i>
@@ -33,22 +41,26 @@
                     <div class="flex flex-col items-center">
                         <button
                             :key="recipie.id"
-                            class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-200"
-                            @click="toggleShow()"
+                            class="rounded-full flex items-ceter p-2 bg-#6f1d1b text-white"
+                            @click="toggleShow(recipie)"
                         >
                             <i class="i-mdi:chef-hat"></i>
-                            <i class="i-mdi:arrow-down"></i>
+                            <i
+                                v-if="!recipie.show"
+                                class="i-mdi:arrow-down"
+                            ></i>
+                            <i v-if="recipie.show" class="i-mdi:arrow-up"></i>
                         </button>
                     </div>
                 </div>
                 <div
-                    v-if="show"
-                    class="bg-amber-400 text-gray-900 text-4xl tracking-widest p-2 flex justify-center items-center transition-all"
+                    v-if="recipie.show"
+                    class="bg-#ffe6a7 text-gray-900 text-4xl tracking-widest p-2 flex justify-center items-center transition-all"
                 >
                     <input
                         v-model="ingredientInput"
                         type="text"
-                        class="border-2 border-gray-300 p-2 w-3/4 text-black rounded-md"
+                        class="border-2 border-gray-300 p-2 w-full text-black rounded-md"
                         placeholder="Add an ingredient"
                         @keyup.enter="addIngredient(recipie)"
                     />
@@ -59,15 +71,16 @@
                         <i class="i-mdi:add"></i>
                     </button>
                 </div>
-                <div class="rounded-b-md bg-amber-400">
+                <div class="rounded-b-md bg-#ffe6a7">
                     <div
                         v-for="ingredient in recipie.ingredients"
                         :key="ingredient.id"
-                        class="text-gray-900 text-4xl tracking-widest py-4 px-4 flex justify-between items-center transition-all"
+                        class="text-gray-900 text-xl tracking-widest py-4 px-4 flex justify-between items-center transition-all"
                     >
-                        {{ ingredient.name }}
+                        {{ '- ' + ingredient.name }}
                         <button
-                            class="bg-white text-red-4 rounded-full flex items-ceter p-2 hover:bg-red-200"
+                            v-if="recipie.show"
+                            class="hover:bg-white hover:text-black rounded-full flex items-center p-2 bg-#6f1d1b text-white"
                             @click="deleteIngredient(ingredient.id)"
                         >
                             <i class="i-mdi:delete"></i>
@@ -85,6 +98,7 @@ import { ref } from 'vue'
 interface Recipie {
     id: number
     name: string
+    show: boolean
     ingredients: Ingredients[]
 }
 
@@ -98,11 +112,13 @@ const recipies = ref([] as Recipie[])
 const input = ref('')
 const ingredientInput = ref('')
 const show = ref(false)
+const whichElement = ref('')
 
 const addRecipie = () => {
     recipies.value.push({
         id: recipies.value.length + 1,
         name: input.value,
+        show: false,
         ingredients: []
     })
     input.value = ''
@@ -125,12 +141,12 @@ const deleteIngredient = (id: number) => {
     })
 }
 
-const toggleShow = () => {
-    if (show.value) {
-        show.value = false
+const toggleShow = (r: Recipie) => {
+    if (r.show) {
+        r.show = false
         return
     } else {
-        show.value = true
+        r.show = true
         return
     }
 }
